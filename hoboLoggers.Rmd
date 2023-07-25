@@ -1,0 +1,67 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(lubridate)
+```
+#Specify file path for csv
+```{r}
+csv <- "testtemp.csv"
+```
+
+#Function to clean data
+```{r}
+clean_hobo_data <- function(csv, n_cols) {
+  
+  #Read csv and extract title
+  df <- read.csv(csv, skip = 1)
+  df_title <- read.csv(csv, nrows = 1, header = FALSE)
+  title <- df_title[1, 1]
+  
+  #Extract date and temperature for two columns
+  if(n_cols == 2){
+    colnames(df) <- c("DateTime", "Temp")
+    df2 <- df[c("DateTime", "Temp")]
+  }
+  
+  #Extract date, temp, and pressure for three columns
+  else if(n_cols == 3){
+    colnames(df) <- c("DateTime", "AbsPressure", "Temp")
+    df2 <- df[c("DateTime", "AbsPressure", "Temp")]
+    df2 <-  df2 %>% drop_na(AbsPressure)
+    
+  }
+  
+  #Return error if 2 or 3 is not specified
+  else{
+    return("Number of columns must be '2' or '3'")
+  }
+  
+  #Remove NA columns (extras at bottom)
+  df2 <- df2 %>% drop_na(Temp)
+  df2$DateTime <- as_datetime(df2$DateTime)
+  
+  #Return the dataframe
+  title <- df2
+  return(df2)
+  print(title)
+
+}
+```
+
+#Calling the function - user must specify the number of columns (2 or 3)
+```{r}
+clean_hobo_data(csv, 2)
+```
+
+
+
+
+write to csv using title
+```{r}
+
+```
+
